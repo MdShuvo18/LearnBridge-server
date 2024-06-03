@@ -29,6 +29,23 @@ async function run() {
         // await client.connect();
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
+
+        const userCollection = client.db('learnBridgeCollection').collection('user')
+
+
+        //  user related api
+        app.post('/user', async (req, res) => {
+            const user = req.body;
+            const result = await userCollection.insertOne(user);
+            res.send(result);
+        })
+
+        app.get('/user',async(req,res)=>{
+            const result = await userCollection.find({}).toArray()
+            res.send(result)
+        })
+
+
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
@@ -36,6 +53,9 @@ async function run() {
     }
 }
 run().catch(console.dir);
+
+
+
 
 app.get('/', (req, res) => {
     res.send('Hello shuvo!')
