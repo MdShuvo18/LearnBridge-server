@@ -30,7 +30,8 @@ async function run() {
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
 
-        const userCollection = client.db('learnBridgeCollection').collection('user')
+        const userCollection = client.db('learnBridgeCollection').collection('user');
+        const allClassesCollection = client.db('learnBridgeCollection').collection('allclasses');
 
 
         //  user related api
@@ -40,8 +41,14 @@ async function run() {
             res.send(result);
         })
 
-        app.get('/user',async(req,res)=>{
+        app.get('/user', async (req, res) => {
             const result = await userCollection.find({}).toArray()
+            res.send(result)
+        })
+
+        // allclasses related api
+        app.get('/allclasses', async (req, res) => {
+            const result = await allClassesCollection.find({}).toArray()
             res.send(result)
         })
 
