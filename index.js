@@ -48,7 +48,12 @@ async function run() {
 
         // allclasses related api
         app.get('/allclasses', async (req, res) => {
-            const result = await allClassesCollection.find({}).toArray()
+            const query = { total_enrolment: { $gt: 1000 } }
+
+            const options = {          
+                sort: { total_enrolment: 1 } ,    
+            };
+            const result = await allClassesCollection.find(query,options).toArray()
             res.send(result)
         })
 
