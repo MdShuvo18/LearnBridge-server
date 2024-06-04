@@ -32,6 +32,7 @@ async function run() {
 
         const userCollection = client.db('learnBridgeCollection').collection('user');
         const allClassesCollection = client.db('learnBridgeCollection').collection('allclasses');
+        const applyteachesCollection = client.db('learnBridgeCollection').collection('applyteaches');
 
         // make admin related api
         app.patch('/user/admin/:id', async (req, res) => {
@@ -43,6 +44,17 @@ async function run() {
                 }
             }
             const result=await userCollection.updateOne(filter,updatedDoc)
+            res.send(result)
+        })
+
+        // apply teaches related api
+        app.post('/applyteaches', async (req, res) => {
+            const applyteaches = req.body;
+            const result = await applyteachesCollection.insertOne(applyteaches);
+            res.send(result);
+        })
+        app.get('/applyteaches', async (req, res) => {
+            const result = await applyteachesCollection.find({}).toArray()
             res.send(result)
         })
 
@@ -60,7 +72,7 @@ async function run() {
 
         // allclasses related api
         app.get('/allclasses', async (req, res) => {
-            const query = { total_enrolment: { $gt: 1000 } }
+            const query = { total_enrolment: { $gt: 100 } }
             const options = {
                 sort: { total_enrolment: 1 },
             };
