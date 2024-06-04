@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
@@ -47,12 +48,14 @@ async function run() {
             res.send(result)
         })
 
+
         // apply teaches related api
         app.post('/applyteaches', async (req, res) => {
             const applyteaches = req.body;
             const result = await applyteachesCollection.insertOne(applyteaches);
             res.send(result);
         })
+
         app.get('/applyteaches', async (req, res) => {
             const result = await applyteachesCollection.find({}).toArray()
             res.send(result)
@@ -69,6 +72,14 @@ async function run() {
             const result=await applyteachesCollection.updateOne(filter,updatedDoc)
             res.send(result)
         })
+
+        app.delete('/applyteaches/teacher/:id',async(req,res)=>{
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const result=await applyteachesCollection.deleteOne(filter)
+            res.send(result)
+        })
+
 
         //  user related api
         app.post('/user', async (req, res) => {
