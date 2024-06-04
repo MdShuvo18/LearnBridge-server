@@ -35,16 +35,28 @@ async function run() {
         const allClassesCollection = client.db('learnBridgeCollection').collection('allclasses');
         const applyteachesCollection = client.db('learnBridgeCollection').collection('applyteaches');
 
+        // jwt related api
+        app.post('/jwt', async (req, res) => {
+            const user = req.body;
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: '1h' });
+            res.send({ token })
+        })
+        // middlewares
+        const verifyToken = (req, res, next) => {
+            console.log('inside token',req.headers)
+            next()
+        }
+
         // make admin related api
         app.patch('/user/admin/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) }
-            const updatedDoc={
-                $set:{
-                    role:'admin'
+            const updatedDoc = {
+                $set: {
+                    role: 'admin'
                 }
             }
-            const result=await userCollection.updateOne(filter,updatedDoc)
+            const result = await userCollection.updateOne(filter, updatedDoc)
             res.send(result)
         })
 
@@ -64,19 +76,19 @@ async function run() {
         app.patch('/applyteaches/teacher/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) }
-            const updatedDoc={
-                $set:{
-                    role:'teacher'
+            const updatedDoc = {
+                $set: {
+                    role: 'teacher'
                 }
             }
-            const result=await applyteachesCollection.updateOne(filter,updatedDoc)
+            const result = await applyteachesCollection.updateOne(filter, updatedDoc)
             res.send(result)
         })
 
-        app.delete('/applyteaches/teacher/:id',async(req,res)=>{
+        app.delete('/applyteaches/teacher/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) }
-            const result=await applyteachesCollection.deleteOne(filter)
+            const result = await applyteachesCollection.deleteOne(filter)
             res.send(result)
         })
 
@@ -88,7 +100,8 @@ async function run() {
             res.send(result);
         })
 
-        app.get('/user', async (req, res) => {
+        app.get('/user', verifyToken, async (req, res) => {
+
             const result = await userCollection.find({}).toArray()
             res.send(result)
         })
