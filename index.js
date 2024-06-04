@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 
@@ -33,6 +33,18 @@ async function run() {
         const userCollection = client.db('learnBridgeCollection').collection('user');
         const allClassesCollection = client.db('learnBridgeCollection').collection('allclasses');
 
+        // make admin related api
+        app.patch('/user/admin/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const updatedDoc={
+                $set:{
+                    role:'admin'
+                }
+            }
+            const result=await userCollection.updateOne(filter,updatedDoc)
+            res.send(result)
+        })
 
         //  user related api
         app.post('/user', async (req, res) => {
@@ -49,11 +61,10 @@ async function run() {
         // allclasses related api
         app.get('/allclasses', async (req, res) => {
             const query = { total_enrolment: { $gt: 1000 } }
-
-            const options = {          
-                sort: { total_enrolment: 1 } ,    
+            const options = {
+                sort: { total_enrolment: 1 },
             };
-            const result = await allClassesCollection.find(query,options).toArray()
+            const result = await allClassesCollection.find(query, options).toArray()
             res.send(result)
         })
 
