@@ -58,6 +58,18 @@ async function run() {
             res.send(result)
         })
 
+        app.patch('/applyteaches/teacher/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const updatedDoc={
+                $set:{
+                    role:'teacher'
+                }
+            }
+            const result=await applyteachesCollection.updateOne(filter,updatedDoc)
+            res.send(result)
+        })
+
         //  user related api
         app.post('/user', async (req, res) => {
             const user = req.body;
