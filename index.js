@@ -34,6 +34,7 @@ async function run() {
         const userCollection = client.db('learnBridgeCollection').collection('user');
         const allClassesCollection = client.db('learnBridgeCollection').collection('allclasses');
         const applyteachesCollection = client.db('learnBridgeCollection').collection('applyteaches');
+        const addTeachersClassCollection=client.db('learnBridgeCollection').collection('addteachersclass');
 
         // jwt related api
         app.post('/jwt', async (req, res) => {
@@ -71,7 +72,7 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/user/applyteaches/:email', verifyToken, async (req, res) => {
+        app.get('/user/admin/:email', verifyToken, async (req, res) => {
             const email = req.params.email;
             if (email !== req.decoded.email) {
                 return res.status(403).send({ message: "Unathuorized access" })
@@ -113,6 +114,8 @@ async function run() {
         })
 
 
+
+
         // apply teaches related api
         app.post('/applyteaches', async (req, res) => {
             const applyteaches = req.body;
@@ -141,6 +144,17 @@ async function run() {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) }
             const result = await applyteachesCollection.deleteOne(filter)
+            res.send(result)
+        })
+
+        // teacher add class related api
+        app.post('/addteachersclass',async(req,res)=>{
+            const addteachersclass=req.body;
+            const result=await addTeachersClassCollection.insertOne(addteachersclass);
+            res.send(result);
+        })
+        app.get('/addteachersclass',async(req,res)=>{
+            const result=await addTeachersClassCollection.find({}).toArray()
             res.send(result)
         })
 
