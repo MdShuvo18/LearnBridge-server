@@ -165,6 +165,25 @@ async function run() {
             res.send(result)
         })
 
+        app.put('/addteachersclass/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true };
+            const updatedItem = req.body;
+            const Item = {
+                $set: {
+                    title: updatedItem.title,
+                    description: updatedItem.description,
+                    price: updatedItem.price,
+                    image: updatedItem.image,
+                    name:updatedItem.name,
+                    email: updatedItem.email
+                }
+            }
+            const result = await addTeachersClassCollection.updateOne(filter, Item, options)
+            res.send(result)
+        })
+
 
 
 
