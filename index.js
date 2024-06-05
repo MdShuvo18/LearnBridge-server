@@ -71,7 +71,7 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/user/admin/:email', verifyToken, async (req, res) => {
+        app.get('/user/applyteaches/:email', verifyToken, async (req, res) => {
             const email = req.params.email;
             if (email !== req.decoded.email) {
                 return res.status(403).send({ message: "Unathuorized access" })
@@ -83,6 +83,33 @@ async function run() {
                 admin = user.role === 'admin'
             }
             res.send({ admin })
+        })
+
+        // make teacher realted api
+        app.patch('/applyteaches/teacher/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    role: 'teacher'
+                }
+            }
+            const result = await applyteachesCollection.updateOne(filter, updatedDoc)
+            res.send(result)
+        })
+
+        app.get('/applyteaches/teacher/:email', verifyToken, async (req, res) => {
+            const email = req.params.email;
+            if (email !== req.decoded.email) {
+                return res.status(403).send({ message: "Unathuorized access" })
+            }
+            const query = { email: email }
+            const user = await applyteachesCollection.findOne(query)
+            let teacher = false;
+            if (user) {
+                teacher = user.role === 'teacher'
+            }
+            res.send({ teacher })
         })
 
 
