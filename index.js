@@ -184,6 +184,13 @@ async function run() {
             res.send(result)
         })
 
+        app.delete('/addteachersclass/:id',async(req,res)=>{
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const result = await addTeachersClassCollection.deleteOne(filter)
+            res.send(result)
+        })
+
 
 
 
