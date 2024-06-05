@@ -34,7 +34,7 @@ async function run() {
         const userCollection = client.db('learnBridgeCollection').collection('user');
         const allClassesCollection = client.db('learnBridgeCollection').collection('allclasses');
         const applyteachesCollection = client.db('learnBridgeCollection').collection('applyteaches');
-        const addTeachersClassCollection=client.db('learnBridgeCollection').collection('addteachersclass');
+        const addTeachersClassCollection = client.db('learnBridgeCollection').collection('addteachersclass');
 
         // jwt related api
         app.post('/jwt', async (req, res) => {
@@ -148,15 +148,24 @@ async function run() {
         })
 
         // teacher add class related api
-        app.post('/addteachersclass',async(req,res)=>{
-            const addteachersclass=req.body;
-            const result=await addTeachersClassCollection.insertOne(addteachersclass);
+        app.post('/addteachersclass', async (req, res) => {
+            const addteachersclass = req.body;
+            const result = await addTeachersClassCollection.insertOne(addteachersclass);
             res.send(result);
         })
-        app.get('/addteachersclass',async(req,res)=>{
-            const result=await addTeachersClassCollection.find({}).toArray()
+        app.get('/addteachersclass', async (req, res) => {
+            const result = await addTeachersClassCollection.find({}).toArray()
             res.send(result)
         })
+
+        app.get('/addteachersclass/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const result = await addTeachersClassCollection.findOne(filter)
+            res.send(result)
+        })
+
+
 
 
         //  user related api
