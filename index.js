@@ -44,7 +44,7 @@ async function run() {
         })
         // middlewares
         const verifyToken = (req, res, next) => {
-            console.log('inside token', req.headers.authorization)
+            // console.log('inside token', req.headers.authorization)
             if (!req.headers.authorization) {
                 return res.status(401).send({ message: "Forbidden access" })
             }
@@ -176,7 +176,7 @@ async function run() {
                     description: updatedItem.description,
                     price: updatedItem.price,
                     image: updatedItem.image,
-                    name:updatedItem.name,
+                    name: updatedItem.name,
                     email: updatedItem.email
                 }
             }
@@ -184,7 +184,7 @@ async function run() {
             res.send(result)
         })
 
-        app.delete('/addteachersclass/:id',async(req,res)=>{
+        app.delete('/addteachersclass/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) }
             const result = await addTeachersClassCollection.deleteOne(filter)
@@ -206,15 +206,29 @@ async function run() {
             res.send(result)
         })
 
-        // allclasses related api
-        app.get('/allclasses', async (req, res) => {
-            const query = { total_enrolment: { $gt: 100 } }
-            const options = {
-                sort: { total_enrolment: 1 },
-            };
-            const result = await allClassesCollection.find(query, options).toArray()
+
+        // allclass related api
+        app.post('/allclass', async (req, res) => {
+            const allclass = req.body;
+            const result = await allClassesCollection.insertOne(allclass);
+            res.send(result);
+        })
+
+        app.get('/allclass', async (req, res) => {
+            const result = await allClassesCollection.find({}).toArray()
             res.send(result)
         })
+
+       
+
+        // app.get('/allclasses', async (req, res) => {
+        //     const query = { total_enrolment: { $gt: 100 } }
+        //     const options = {
+        //         sort: { total_enrolment: 1 },
+        //     };
+        //     const result = await allClassesCollection.find(query, options).toArray()
+        //     res.send(result)
+        // })
 
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
