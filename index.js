@@ -218,6 +218,12 @@ async function run() {
             const result = await allClassesCollection.find({}).toArray()
             res.send(result)
         })
+        app.get('/allclass/:id', async (req, res) => {
+            const result = await allClassesCollection.find({}).toArray()
+            res.send(result)
+        })
+
+        
 
        
 
