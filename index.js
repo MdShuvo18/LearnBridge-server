@@ -5,7 +5,8 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
-
+const stripe = require('stripe')(process.env.SECRET_KEY)
+// console.log(process.env.SECRET_KEY)
 
 // middleware
 app.use(cors());
@@ -35,6 +36,7 @@ async function run() {
         const allClassesCollection = client.db('learnBridgeCollection').collection('allclasses');
         const applyteachesCollection = client.db('learnBridgeCollection').collection('applyteaches');
         const addTeachersClassCollection = client.db('learnBridgeCollection').collection('addteachersclass');
+        const paymentCollection = client.db('learnBridgeCollection').collection('paymentCollection');
 
         // jwt related api
         app.post('/jwt', async (req, res) => {
@@ -223,9 +225,41 @@ async function run() {
             res.send(result)
         })
 
-        
 
-       
+        // payment intent related api
+        app.post('/create-payment-intent', async (req, res) => {
+            const { amount } = req.body;
+            const price = parseInt(amount * 100)
+            // console.log(price, 'inside intent')
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: price,
+                currency: 'usd',
+                payment_method_types: ['card'],
+
+            })
+            // console.log(paymentIntent)
+            res.send({
+                clientSecret: paymentIntent.client_secret
+            })
+        })
+
+        // payment collection
+        app.post('/payment', async (req, res) => {
+            const payment = req.body;
+            console.log(payment)
+            const result = await paymentCollection.insertOne(payment);
+            res.send(result);
+        })
+
+        app.get('/payment', async (req, res) => {
+            const email = req.query.email
+            const query = { email: email }
+            const result = await paymentCollection.find(query).toArray()
+            res.send(result)
+        })
+
+
+
 
         // app.get('/allclasses', async (req, res) => {
         //     const query = { total_enrolment: { $gt: 100 } }
