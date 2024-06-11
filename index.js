@@ -37,7 +37,8 @@ async function run() {
         const applyteachesCollection = client.db('learnBridgeCollection').collection('applyteaches');
         const addTeachersClassCollection = client.db('learnBridgeCollection').collection('addteachersclass');
         const paymentCollection = client.db('learnBridgeCollection').collection('paymentCollection');
-        const assignmentCollection= client.db('learnBridgeCollection').collection('assignmentCollection');
+        const assignmentCollection = client.db('learnBridgeCollection').collection('assignmentCollection');
+        const assignmentSubmissionCollection = client.db('learnBridgeCollection').collection('assignmentSubmissionCollection');
         // jwt related api
         app.post('/jwt', async (req, res) => {
             const user = req.body;
@@ -199,14 +200,33 @@ async function run() {
             const result = await addTeachersClassCollection.deleteOne(filter)
             res.send(result)
         })
-       
-        app.post('/assignmentcollection', async(req,res)=>{
+
+        // Assignment Collection related api
+        app.post('/assignmentcollection', async (req, res) => {
             const assignmentcollection = req.body;
             const result = await assignmentCollection.insertOne(assignmentcollection);
             res.send(result);
         })
-        app.get('/assignmentcollection', async(req,res)=>{
+        app.get('/assignmentcollection', async (req, res) => {
             const result = await assignmentCollection.find({}).toArray()
+            res.send(result)
+        })
+        app.get('/assignmentcollection/:title', async (req, res) => {
+            const title = req.params.title
+            // console.log(title)
+            const query = { title: title }
+            const result = await assignmentCollection.find(query).toArray()
+            res.send(result)
+        })
+
+         // Assignment Submit Collection related api
+         app.post('/assignmentsubmitcollection', async (req, res) => {
+            const assignmentsubmitcollection = req.body;
+            const result = await assignmentSubmissionCollection.insertOne(assignmentsubmitcollection);
+            res.send(result);
+        })
+        app.get('/assignmentsubmitcollection',async(req,res)=>{
+            const result = await assignmentSubmissionCollection.find({}).toArray()
             res.send(result)
         })
 
@@ -328,6 +348,15 @@ async function run() {
             // console.log(result)
             res.send(result)
         })
+
+        app.get('/payment/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const result = await paymentCollection.findOne(filter).toArray();
+            res.send(result)
+        })
+
+
 
 
 
