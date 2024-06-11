@@ -37,7 +37,7 @@ async function run() {
         const applyteachesCollection = client.db('learnBridgeCollection').collection('applyteaches');
         const addTeachersClassCollection = client.db('learnBridgeCollection').collection('addteachersclass');
         const paymentCollection = client.db('learnBridgeCollection').collection('paymentCollection');
-
+        const assignmentCollection= client.db('learnBridgeCollection').collection('assignmentCollection');
         // jwt related api
         app.post('/jwt', async (req, res) => {
             const user = req.body;
@@ -155,8 +155,15 @@ async function run() {
             const result = await addTeachersClassCollection.insertOne(addteachersclass);
             res.send(result);
         })
+
         app.get('/addteachersclass', async (req, res) => {
             const result = await addTeachersClassCollection.find({}).toArray()
+            res.send(result)
+        })
+        app.get('/addteachersclass', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email }
+            const result = await addTeachersClassCollection.find(query).toArray()
             res.send(result)
         })
 
@@ -192,7 +199,16 @@ async function run() {
             const result = await addTeachersClassCollection.deleteOne(filter)
             res.send(result)
         })
-
+       
+        app.post('/assignmentcollection', async(req,res)=>{
+            const assignmentcollection = req.body;
+            const result = await assignmentCollection.insertOne(assignmentcollection);
+            res.send(result);
+        })
+        app.get('/assignmentcollection', async(req,res)=>{
+            const result = await assignmentCollection.find({}).toArray()
+            res.send(result)
+        })
 
 
 
@@ -209,7 +225,7 @@ async function run() {
         })
 
 
-        // allclass related api
+        // allclasses related api
         app.post('/allclass', async (req, res) => {
             const allclass = req.body;
             const result = await allClassesCollection.insertOne(allclass);
@@ -218,6 +234,7 @@ async function run() {
 
         app.get('/allclass', async (req, res) => {
             const result = await allClassesCollection.find({}).toArray()
+            // console.log(result)
             res.send(result)
         })
         app.get('/allclass/:id', async (req, res) => {
@@ -225,6 +242,53 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/allclass', async (req, res) => {
+            const query = { total_enrolment: { $gt: 0 } }
+            const options = {
+                sort: { total_enrolment: -1 },
+            };
+            const result = await allClassesCollection.find(query, options).toArray()
+            res.send(result)
+        })
+
+
+        // app.post('/enroll/:id', async (req, res) => {
+        //     const classId = req.params.id
+        //     const result = await allClassesCollection.findOneAndUpdate(
+        //         { _id: new ObjectId(classId) },
+        //         { $inc: { enrollment: 1 } },
+        //         { returnDocument: 'after' }
+        //     )
+        //     if (result && result.value && result.value.enrollment !== undefined) {
+        //         res.status(200).json({ enrollment: result.value.enrollment });
+        //     } else {
+        //         res.status(404).send('Class not found');
+        //     }
+        // })
+
+        // app.get('/enroll/:id', async (req, res) => {
+        //     const classId = req.params.id
+        //     const result = await allClassesCollection.findOne({ _id: new Object(classId) })
+        //     if (result) {
+        //         res.status(200).json({ enrollment: result.enrollment });
+        //     } else {
+        //         res.status(404).send('Class not found');
+        //     }
+        // })
+
+        // app.get('/enroll', async (req, res) => {
+        //     try {
+        //         const enrollments = await allClassesCollection.find().toArray();
+        //         const totalEnrollments = {};
+        //         enrollments.forEach((enrollment) => {
+        //             totalEnrollments[enrollment.classId] = enrollment.count;
+        //         });
+        //         res.json(totalEnrollments);
+        //     } catch (error) {
+        //         console.error(error);
+        //         res.status(500).send('Internal Server Error');
+        //     }
+        // });
 
         // payment intent related api
         app.post('/create-payment-intent', async (req, res) => {
@@ -235,6 +299,7 @@ async function run() {
                 amount: price,
                 currency: 'usd',
                 payment_method_types: ['card'],
+                // date: new Date(paymentIntent.)
 
             })
             // console.log(paymentIntent)
@@ -246,29 +311,26 @@ async function run() {
         // payment collection
         app.post('/payment', async (req, res) => {
             const payment = req.body;
-            console.log(payment)
+            // console.log(payment)
             const result = await paymentCollection.insertOne(payment);
             res.send(result);
         })
-
         app.get('/payment', async (req, res) => {
-            const email = req.query.email
+            const result = await paymentCollection.find({}).toArray()
+            res.send(result)
+        })
+
+        app.get('/payment/:email', async (req, res) => {
+            const email = req.params.email
             const query = { email: email }
+            // console.log(email)
             const result = await paymentCollection.find(query).toArray()
+            // console.log(result)
             res.send(result)
         })
 
 
 
-
-        // app.get('/allclasses', async (req, res) => {
-        //     const query = { total_enrolment: { $gt: 100 } }
-        //     const options = {
-        //         sort: { total_enrolment: 1 },
-        //     };
-        //     const result = await allClassesCollection.find(query, options).toArray()
-        //     res.send(result)
-        // })
 
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
